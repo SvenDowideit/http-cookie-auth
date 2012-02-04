@@ -295,6 +295,60 @@ Examples
 Most details of request and response headers has been omitted. Assume
 that the user agent has no stored cookies.
 
+Simple example (HTTP only)
+============================================
+
+TODO: needs CSRF protection (strikeone?) and some words on the sad reality both 
+common-ness of use and lack of secure-ness
+
+#. User Agent -> Server::
+
+     GET /acme/ HTTP/1.1
+     Host: www.example.net
+
+#. Server -> User Agent::
+
+     HTTP/1.1 401 Unauthorized
+     WWW-Authenticate: Cookie realm="Acme"
+	     form-action="/acme/login"
+	     cookie-name=ACME_TICKET
+     Content-Type: text/html
+
+     <!DOCTYPE html>
+     <title>Unauthorized</title>
+     <form action=/acme/login method=POST>
+     <input type=hidden name=referer value=/acme/ >
+     <p><label>Username: <input name=user></label>
+     <p><label>Password: <input name=pwd type=password></label>
+     <p><button type=submit>Sign in</button>
+     <p><a href=/acme/register>Register for an account</a>
+     </form>
+
+#. User Agent -> Server::
+
+     POST /acme/login HTTP/1.1
+     Host: www.example.net
+     Content-Type: application/x-www-form-urlencoded
+
+     referer=%2Facme%2F&user=Aladdin&password=open%20sesame
+
+#. Server -> User Agent::
+
+     HTTP/1.1 303 See Other
+     Location: https://www.example.com/acme/
+     Set-Cookie: ACME_TICKET="sdf354s5c1s8e1s"; Path="/acme"; Secure
+
+#. User Agent -> Server::
+
+     GET /acme/ HTTP/1.1
+     Host: www.example.com
+     Cookie: ACME_TICKET="sdf354s5c1s8e1s"
+
+#. Server -> User Agent::
+
+     HTTP/1.1 200 OK
+
+
 Simple example (everything goes through TLS)
 ============================================
 #. User Agent -> Server::
